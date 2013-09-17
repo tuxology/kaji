@@ -14,7 +14,10 @@ trampoline.o: trampoline.s
 util.o: util.c util.h
 	gcc -Wall -fPIC -I. -c $< -o $@
 
-client: client.o util.o
+client.o: client.c client.h 
+	gcc -Wall -fPIC -I. -c $< -o $@
+
+client: client.o util.o -lbfd -ldistorm3
 
 .PHONY: clean
 clean:
