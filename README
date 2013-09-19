@@ -2,9 +2,9 @@ This is a very basic demo of dynamic lttng probe instrumentation.
 
 Only x86-64 supported for now.
 
-Dependencies :
-    diStorm3 -  http://code.google.com/p/diStorm3
-    libbfd, libopcodes - sudo yum install binutils-devel
+Dependencies:
+    diStorm3 - http://code.google.com/p/diStorm3
+    libbfd, libopcodes - included in binutils
 
 To compile:
     make
