@@ -11,3 +11,4 @@ sleep 1
 kill -USR1 $pid
 wait $pid
 lttng -q stop; sleep 1; lttng view; lttng -q destroy
+

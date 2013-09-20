@@ -17,8 +17,10 @@ util.o: util.c util.h
 client.o: client.c client.h 
 	gcc -Wall -fPIC -I. -c $< -o $@
 
-client: client.o util.o -lbfd -ldistorm3
+client: client.o util.o
+	gcc $^ -lbfd -ldistorm3 -o $@
 
 .PHONY: clean
 clean:
 	rm -f *.so *.o demo client
+

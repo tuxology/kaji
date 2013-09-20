@@ -26,7 +26,8 @@ void usage(char *progname)
 }
 
 /* Parse options */
-int parse_opts(struct env_opts *env, char *argv[]){
+int parse_opts(struct env_opts *env, char *argv[])
+{
     int ret = 0;
     char *buff;
     char *name;
@@ -57,7 +58,8 @@ int parse_opts(struct env_opts *env, char *argv[]){
 }
 
 /* Resolve symbol name to addr */
-long get_sym_addr(char* path, char* sym){
+long get_sym_addr(char* path, char* sym)
+{
     long addr = 0;
 
     /* load symbol table*/
@@ -100,7 +102,8 @@ long get_sym_addr(char* path, char* sym){
 
 
 /* Get instruction size */
-size_t get_insn_size(char* path, long addr){
+size_t get_insn_size(char* path, long addr)
+{
     _DecodeResult res;
     _DecodedInst decodedInstructions[1];
     unsigned int decodedInstructionsCount = 0;
