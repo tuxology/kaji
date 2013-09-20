@@ -33,7 +33,7 @@ int parse_opts(struct env_opts *env, char *argv[])
     char *name;
     char *off;
     char *plus = "+";
-    
+
     /* Set path*/
     env->path = argv[1];
 
@@ -185,13 +185,6 @@ int main(int argc, char *argv[])
 
     ret = parse_opts(&env, argv);
 
-#if 0
-    printf("Name : %s\n", env.path);
-    printf("PID : %d\n", env.pid);
-    printf("Symbol : %s\n", env.sym);
-    printf("Offset : %lx\n", env.offset);
-#endif
-
     /*
      * Use ptrace to attach the instrumented process,
      * the in-process-agent thread is untouched.
@@ -219,8 +212,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "I can't instrument instructions < 5 bytes for now :(\n");
         exit(-1);
     }
-//    command.addr = (void*) strtol(argv[3], NULL, 0);
-//    command.len = (size_t) strtol(argv[4], NULL, 0);
     ret = send(sock_fd, &command, sizeof(command), 0);
     _assert(ret == sizeof(struct kaji_command), "send");
 
@@ -234,4 +225,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-
