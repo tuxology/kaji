@@ -1,26 +1,12 @@
-all: libkaji.so demo client
+include Makefile.inc
 
-CFLAGS=-Wall
+DIRS = demo src
 
-libkaji.so: kaji.o trampoline.o util.o
-	gcc -ldl -lpthread -llttng-ust -shared $^ -o $@
+all: $(DIRS)
 
-kaji.o: kaji.c server.h kaji.h ust_kaji_test.h
-	gcc -Wall -fPIC -I. -c $< -o $@
+$(DIRS):
+	$(MAKE) -C $@
 
-trampoline.o: trampoline.s
-	gcc -fPIC -c $< -o $@
-
-util.o: util.c util.h
-	gcc -Wall -fPIC -I. -c $< -o $@
-
-client.o: client.c client.h 
-	gcc -Wall -fPIC -I. -c $< -o $@
-
-client: client.o util.o
-	gcc $^ -lbfd -ldistorm3 -o $@
-
-.PHONY: clean
+.PHONY: clean $(DIRS)
 clean:
-	rm -f *.so *.o demo client
-
+	-for d in $(DIRS); do (cd $$d; $(MAKE) clean); done;

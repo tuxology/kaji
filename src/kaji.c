@@ -22,7 +22,7 @@
 
 #define min(a, b) ( (a) > (b) ? (a) : (b) )
 
-/* Assembly labels declared as functions here to enable relocation*/
+/* Assembly labels declared as functions here to enable relocation. */
 extern void kaji_trampoline();
 extern void __kaji_trampoline_placeholder();
 extern void __kaji_trampoline_end();

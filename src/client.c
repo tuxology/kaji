@@ -9,7 +9,6 @@
 #include <string.h>
 #include "kaji.h"
 #include "util.h"
-#include "client.h"
 
 /* To supress config.h error for libbfd
    Will be replaced when autotools are used */
@@ -19,6 +18,14 @@
 #include <bfd.h>
 #include <dis-asm.h>
 #include <distorm.h>
+
+struct env_opts {
+	char* path;
+	char* sym;
+	long addr;
+	pid_t pid;
+	long offset;
+};
 
 void usage(char *progname)
 {
