@@ -7,8 +7,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "kaji.h"
-#include "util.h"
+#include "error.h"
 
 /* To supress config.h error for libbfd
    Will be replaced when autotools are used */
@@ -20,11 +21,11 @@
 #include <distorm.h>
 
 struct env_opts {
-	char* path;
-	char* sym;
-	long addr;
-	pid_t pid;
-	long offset;
+        char* path;
+        char* sym;
+        long addr;
+        pid_t pid;
+        long offset;
 };
 
 void usage(char *progname)
@@ -196,21 +197,30 @@ int main(int argc, char *argv[])
      * Use ptrace to attach the instrumented process,
      * the in-process-agent thread is untouched.
      */
-    ret = ptrace(PTRACE_ATTACH, env.pid, NULL, NULL);
-    _assert(ret != -1, "PTRACE_ATTACH");
+    if (ptrace(PTRACE_ATTACH, env.pid, NULL, NULL) == -1) {
+        PERROR("Ptrace attach failed");
+        goto error;
+    }
     ret = waitpid(env.pid, &stat, WUNTRACED);
-    _assert((ret == env.pid) && WIFSTOPPED(stat), "waitpid");
+    if ((ret != env.pid) || WIFSTOPPED(stat), "waitpid") {
+        PERROR("Waitpid failed");
+        goto error;
+    }
 
     /* Connect to in-process-agent */
-    sock_fd = socket(PF_UNIX, SOCK_STREAM, 0);
-    _assert(socket >= 0, "socket");
+    if ((sock_fd = socket(PF_UNIX, SOCK_STREAM, 0)) < 0) {
+        PERROR("Create socket failed");
+        goto error;
+    }
 
     memset(&addr, 0, sizeof(addr));
     addr.sun_family = AF_UNIX;
     snprintf(addr.sun_path, sizeof(addr.sun_path), pathname);
     addr.sun_path[sizeof(addr.sun_path) - 1] = '\0';
-    ret = connect(sock_fd, (struct sockaddr*) &addr, sizeof(addr));
-    _assert(ret != -1, "connect");
+    if (connect(sock_fd, (struct sockaddr*) &addr, sizeof(addr)) == -1) {
+        PERROR("Connect to IPA failed");
+        goto error;
+    }
 
     /* Construct and send command to IPA */
     command.addr = (void*) (get_sym_addr(env.path, env.sym) +env.offset);
@@ -219,16 +229,26 @@ int main(int argc, char *argv[])
         fprintf(stderr, "I can't instrument instructions < 5 bytes for now :(\n");
         exit(-1);
     }
-    ret = send(sock_fd, &command, sizeof(command), 0);
-    _assert(ret == sizeof(struct kaji_command), "send");
+    if (send(sock_fd, &command, sizeof(command), 0) != sizeof(struct kaji_command)) {
+        ERR("Send command failed");
+        goto error;
+    }
 
     /* Verify reply form IPA */
     ret = recv(sock_fd, &reply, sizeof(reply), 0);
-    _assert(ret == sizeof(reply) && reply == KAJI_REPLY_OK, "recv");
+    if (ret != sizeof(reply) || reply != KAJI_REPLY_OK) {
+        ERR("Receive command reply failed");
+        goto error;
+    }
 
     /* Detach the instrumented process */
-    ret = ptrace(PTRACE_DETACH, env.pid, NULL, 0);
-    _assert(ret != -1, "PTRACE_DETACH");
+    if (ptrace(PTRACE_DETACH, env.pid, NULL, 0) == -1) {
+        PERROR("Ptrace detach failed");
+        goto error;
+    }
 
     return 0;
+
+error:
+    return -1;
 }

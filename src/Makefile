@@ -4,7 +4,7 @@ CFLAGS += -I../include
 
 all: libkaji.so client
 
-libkaji.so: kaji.o trampoline.o util.o
+libkaji.so: kaji.o trampoline.o
 	gcc -ldl -lpthread -llttng-ust -shared $^ -o $@
 
 kaji.o: kaji.c server.h kaji.h ust_kaji_test.h
@@ -13,14 +13,11 @@ kaji.o: kaji.c server.h kaji.h ust_kaji_test.h
 trampoline.o: trampoline.s
 	gcc -fPIC -c $< -o $@
 
-util.o: util.c util.h
-	gcc -Wall -fPIC -I. -c $< -o $@
-
 client.o: client.c
 	gcc -Wall -I. -c $< -o $@
 
-client: client.o util.o
-	gcc $^ -lbfd -ldl -liberty -lz -o $@
+client: client.o
+	gcc $^ -lbfd -ldl -ldistorm3 -liberty -lz -o $@
 
 .PHONY: clean
 clean:
