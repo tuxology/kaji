@@ -109,7 +109,7 @@ void* kaji_loop(void *arg)
         goto error;
     }
 
-    if (!listen(sock_fd, MAX_LISTEN)) {
+    if (listen(sock_fd, MAX_LISTEN) != 0) {
         PERROR("Listen socket failed");
         goto error;
     }

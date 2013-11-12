@@ -2,10 +2,10 @@
 
 lttng -q create; lttng -q enable-event -a -u; lttng -q start
 
-LD_PRELOAD=./libkaji.so ./demo & pid=$!
+LD_PRELOAD=../src/libkaji.so ./demo & pid=$!
 sleep 1
 
-./client ./demo $pid do_stuff+0x11
+../src/client ./demo $pid do_stuff+0x11
 sleep 1
 
 kill -USR1 $pid

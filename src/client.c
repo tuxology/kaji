@@ -74,10 +74,10 @@ long get_sym_addr(char* path, char* sym)
     long size;
     long nsym;
     asymbol **asymtab;
- 
+
     bfd_init();
     bfd *abfd = bfd_openr(path, NULL);
- 
+
     bfd_check_format(abfd, bfd_object);
     size = bfd_get_symtab_upper_bound(abfd);
     asymtab = malloc(size);
@@ -103,7 +103,7 @@ long get_sym_addr(char* path, char* sym)
 
     if (!found){
         printf("Symbol Not found! \n");
-        exit(-1);   
+        exit(-1);
     }
     return -1;
 }
@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
         goto error;
     }
     ret = waitpid(env.pid, &stat, WUNTRACED);
-    if ((ret != env.pid) || WIFSTOPPED(stat), "waitpid") {
+    if ((ret != env.pid) || !WIFSTOPPED(stat)) {
         PERROR("Waitpid failed");
         goto error;
     }
