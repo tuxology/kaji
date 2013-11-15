@@ -218,16 +218,16 @@ void kaji_install_trampoline(void* addr, size_t len)
     memcpy(jmp_pad, kaji_trampoline, __kaji_trampoline_end - kaji_trampoline);
     placeholder = jmp_pad + (__kaji_trampoline_placeholder - kaji_trampoline);
 
-    /* Copy the origin instruction to trampoline */
+    /* Copy the original instruction to trampoline */
     memcpy(placeholder, addr, len);
 
     /* Write a jmp from trampoline back to origin code flow */
-    jmp_offset = addr - (void*) (placeholder + len);
+    jmp_offset = addr - (void*) (placeholder + sizeof(jmp_buff));
     memcpy(jmp_buff + 1, &jmp_offset, sizeof(jmp_offset));
     memcpy(placeholder + len, jmp_buff, sizeof(jmp_buff));
 
     /* Write a jmp to trampoline */
-    jmp_offset = (void*) jmp_pad - (addr + len);
+    jmp_offset = (void*) jmp_pad - (addr + sizeof(jmp_buff));
     memcpy(jmp_buff + 1, &jmp_offset, sizeof(jmp_offset));
     memcpy(addr, jmp_buff, sizeof(jmp_buff));
 
