@@ -10,6 +10,13 @@ extern "C" {
 
 #include <lttng/tracepoint.h>
 
+TRACEPOINT_EVENT(ust_kaji_test, tpint,
+	TP_ARGS(int, v),
+	TP_FIELDS(
+        ctf_integer(int, v, v)
+    )
+)
+
 TRACEPOINT_EVENT(ust_kaji_test, tptest,
 	TP_ARGS(),
 	TP_FIELDS()

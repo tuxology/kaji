@@ -23,6 +23,7 @@
 struct env_opts {
         char* path;
         char* sym;
+        char* pload;
         long addr;
         pid_t pid;
         long offset;
@@ -57,6 +58,9 @@ int parse_opts(struct env_opts *env, char *argv[])
         env->sym = buff;
         env->offset = 0;
     }
+
+    /* Set payload */
+    env->pload = argv[4];
 
     /* Set PID*/
     env->pid = (pid_t) strtol(argv[2], NULL, 0);
@@ -106,6 +110,13 @@ long get_sym_addr(char* path, char* sym)
         exit(-1);
     }
     return -1;
+}
+
+/* TODO Implement for local variables as well using libdwarf? */
+/* Get address of payload */
+long get_payload_addr(char* path, char* pload)
+{
+    return 0;
 }
 
 
@@ -186,7 +197,7 @@ int main(int argc, char *argv[])
     struct kaji_command command;
     struct env_opts env;
 
-    if (argc != 4) {
+    if (argc != 5) {
         usage(argv[0]);
         exit(-1);
     }
@@ -225,6 +236,8 @@ int main(int argc, char *argv[])
     /* Construct and send command to IPA */
     command.addr = (void*) (get_sym_addr(env.path, env.sym) +env.offset);
     command.len = get_insn_size(env.path, (long) command.addr);
+    command.pload = (void*) (get_sym_addr(env.path, env.pload));
+
     if (command.len < 5){
         fprintf(stderr, "I can't instrument instructions < 5 bytes for now :(\n");
         exit(-1);

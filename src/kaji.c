@@ -167,6 +167,9 @@ void* kaji_loop(void *arg)
                     memcpy(&command, buffer, sizeof(struct kaji_command));
                     kaji_install_trampoline(command.addr, command.len);
 
+                    printf("Payload addr is : %x\n", command.pload); //SUCHAKRA
+                    unsigned char *p = (unsigned char*) command.pload;
+                    printf("Value is : %d\n", (int) *p);
                     reply = KAJI_REPLY_OK;
                     write(events[i].data.fd, &reply, sizeof(reply));
                 }
@@ -235,8 +238,14 @@ error:
     return;
 }
 
-/* This is the instrumented probe */
+/* This is an empty instrumented probe */
 void kaji_probe()
 {
     tracepoint(ust_kaji_test, tptest);
+}
+
+/* This is the probe for integer tracepoints*/
+void kaji_int_probe(int pload)
+{
+    tracepoint(ust_kaji_test, tpint, pload);
 }
