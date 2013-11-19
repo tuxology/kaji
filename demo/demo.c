@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <signal.h>
 
-volatile int v=43;
+volatile int var=43;
 
 void do_stuff()
 {

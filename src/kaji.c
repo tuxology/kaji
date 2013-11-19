@@ -30,6 +30,7 @@ extern void __kaji_trampoline_end();
 extern void __kaji_trampoline_call();
 
 #define PAGESIZE 4096
+int* g_var = NULL;
 
 /* Set a section of memory to be writable */
 static int set_writable(void* addr, size_t len)
@@ -165,11 +166,12 @@ void* kaji_loop(void *arg)
                     }
 
                     memcpy(&command, buffer, sizeof(struct kaji_command));
+                    g_var = (int*) command.pload;
+#if 0
+                    printf("Payload addr is : %p\n", command.pload);
+                    printf("Value is : %d\n", *g_var);
+#endif
                     kaji_install_trampoline(command.addr, command.len);
-
-                    printf("Payload addr is : %x\n", command.pload); //SUCHAKRA
-                    unsigned char *p = (unsigned char*) command.pload;
-                    printf("Value is : %d\n", (int) *p);
                     reply = KAJI_REPLY_OK;
                     write(events[i].data.fd, &reply, sizeof(reply));
                 }
@@ -191,7 +193,7 @@ void kaji_install_trampoline(void* addr, size_t len)
 {
     unsigned char jmp_buff[] = { 0xe9, 0, 0, 0 , 0 };
     int32_t jmp_offset;
-    void *jmp_pad, *placeholder, *probe_addr = (void*) kaji_probe;
+    void *jmp_pad, *placeholder, *probe_addr = (void*) kaji_int_probe;
     size_t trampoline_size = __kaji_trampoline_end - kaji_trampoline;
 
     /* Set memory permission to writable */
@@ -245,7 +247,7 @@ void kaji_probe()
 }
 
 /* This is the probe for integer tracepoints*/
-void kaji_int_probe(int pload)
+void kaji_int_probe()
 {
-    tracepoint(ust_kaji_test, tpint, pload);
+    tracepoint(ust_kaji_test, tpint, *g_var);
 }

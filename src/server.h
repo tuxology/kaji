@@ -6,3 +6,4 @@ static void* kaji_loop(void *arg);
 static void kaji_install_trampoline(void *addr, size_t len);
 
 void kaji_probe(void);
+void kaji_int_probe(void);

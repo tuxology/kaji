@@ -1,4 +1,5 @@
 .extern kaji_probe
+.extern kaji_int_probe
 .section .text
 .align 4096
 .globl kaji_trampoline
